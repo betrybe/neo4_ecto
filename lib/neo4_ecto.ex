@@ -42,6 +42,15 @@ defmodule Neo4Ecto do
     |> do_insert()
   end
 
+  @impl true
+  def insert_all(_, _, _, _, _, _, _, _), do: raise "Not ready yet"
+
+  @impl true
+  def update(_, _, _, _, _, _), do: raise "Not ready yet"
+
+  @impl true
+  def delete(_, _, _, _), do: raise "Not ready yet"
+
   def execute(query) do
     Bolt.Sips.conn()
     |> Bolt.Sips.query!(query)
