@@ -1,5 +1,21 @@
 defmodule Neo4Ecto do
-  @moduledoc false
+  @moduledoc """
+  Neo4j adapter for Ecto.
+
+  Handle Ecto behaviours implementations in a way that enables us
+  to use Neo4j like we use Ecto daily.
+
+  Currently, this implementation covers:
+  @Ecto.Adapter -> So you can use Neo4Ecto as your repo adapter
+
+  ## Example
+
+        defmodule MyApp.Repo do
+          use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+        end
+
+  @Ecto.Adapter.Schema -> You'll be able to use the basic functions of Repo, such as: [Repo.insert/1, Repo.update/2, Repo.delete/1]
+  """
 
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
