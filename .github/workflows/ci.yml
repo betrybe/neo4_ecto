@@ -1,0 +1,45 @@
+name: CI
+on: [push, pull_request]
+jobs:
+    neo4j:
+    runs-on: ubuntu-18.04
+    services:
+      neo4j:
+        image: neo4j:4.2
+        ports: [ "7687:7687" ]
+        env:
+          NEO4J_ACCEPT_LICENSE_AGREEMENT: yes
+          NEO4J_AUTH: none
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p test 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-start-period 10s
+          --health-retries 5
+
+    elixir:
+    runs-on: ubuntu-18.04
+    env:
+      MIX_ENV: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pair:
+              elixir: 1.8.2
+              otp: 20.3.8
+          - pair:
+              elixir: 1.11.4
+              otp: 23.2.5
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.pair.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
+
+      - run: mix deps.get --only test
+      - run: mix format --check-formatted
+      - run: mix compile --warnings-as-errors
+      - run: mix test
