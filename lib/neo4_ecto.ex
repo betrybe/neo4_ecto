@@ -2,6 +2,7 @@ defmodule Neo4Ecto do
   @moduledoc false
 
   @behaviour Ecto.Adapter
+  @behaviour Ecto.Adapter.Schema
 
   @impl true
   defmacro __before_compile__(_opts), do: :ok
@@ -29,14 +30,12 @@ defmodule Neo4Ecto do
   def dumpers(:binary_id, ecto_type), do: [ecto_type, Ecto.UUID]
   def dumpers(_primitive_type, ecto_type), do: [ecto_type]
 
-  @behaviour Ecto.Adapter.Schema
-
   @impl true
   def autogenerate(:binary_id), do: Ecto.UUID.generate()
   def autogenerate(_), do: nil
 
   @impl true
-  def insert(adapter_meta, %{source: node}, fields, on_conflict, returning, opts) do
+  def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
     node
     |> build_query(fields)
     |> execute()

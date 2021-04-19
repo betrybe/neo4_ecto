@@ -22,7 +22,8 @@ defmodule Neo4Ecto.MixProject do
   defp deps do
     [
       {:ecto, "~> 3.6.1"},
-      {:bolt_sips, "~> 2.0"}
+      {:bolt_sips, "~> 2.0"},
+      {:credo, "~> 1.3", only: [:dev, :test], runtime: false}
     ]
   end
 end
