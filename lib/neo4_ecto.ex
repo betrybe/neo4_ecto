@@ -20,37 +20,37 @@ defmodule Neo4Ecto do
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
 
-  @impl true
+  @impl Ecto.Adapter
   defmacro __before_compile__(_opts), do: :ok
 
-  @impl true
+  @impl Ecto.Adapter
   def ensure_all_started(_config, type) do
     {:ok, _} = Application.ensure_all_started(:bolt_sips, type)
   end
 
-  @impl true
+  @impl Ecto.Adapter
   def init(opts) do
     config = opts || neo4j_url()
 
     {:ok, Bolt.Sips.child_spec(config), %{}}
   end
 
-  @impl true
+  @impl Ecto.Adapter
   def checkout(_adapter_meta, _config, _fun), do: Bolt.Sips.conn()
 
-  @impl true
+  @impl Ecto.Adapter
   def loaders(:binary_id, ecto_type), do: [Ecto.UUID, ecto_type]
   def loaders(_primitive_type, ecto_type), do: [ecto_type]
 
-  @impl true
+  @impl Ecto.Adapter
   def dumpers(:binary_id, ecto_type), do: [ecto_type, Ecto.UUID]
   def dumpers(_primitive_type, ecto_type), do: [ecto_type]
 
-  @impl true
+  @impl Ecto.Adapter.Schema
   def autogenerate(:binary_id), do: Ecto.UUID.generate()
   def autogenerate(_), do: nil
 
-  @impl true
+  @impl Ecto.Adapter.Schema
   def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
     node
     |> build_query(fields)
@@ -58,13 +58,13 @@ defmodule Neo4Ecto do
     |> do_insert()
   end
 
-  @impl true
+  @impl Ecto.Adapter.Schema
   def insert_all(_, _, _, _, _, _, _, _), do: raise "Not ready yet"
 
-  @impl true
+  @impl Ecto.Adapter.Schema
   def update(_, _, _, _, _, _), do: raise "Not ready yet"
 
-  @impl true
+  @impl Ecto.Adapter.Schema
   def delete(_, _, _, _), do: raise "Not ready yet"
 
   def execute(query) do
