@@ -59,13 +59,13 @@ defmodule Neo4Ecto do
   end
 
   @impl Ecto.Adapter.Schema
-  def insert_all(_, _, _, _, _, _, _, _), do: raise "Not ready yet"
+  def insert_all(_, _, _, _, _, _, _, _), do: raise("Not ready yet")
 
   @impl Ecto.Adapter.Schema
-  def update(_, _, _, _, _, _), do: raise "Not ready yet"
+  def update(_, _, _, _, _, _), do: raise("Not ready yet")
 
   @impl Ecto.Adapter.Schema
-  def delete(_, _, _, _), do: raise "Not ready yet"
+  def delete(_, _, _, _), do: raise("Not ready yet")
 
   def execute(query) do
     Bolt.Sips.conn()

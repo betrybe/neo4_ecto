@@ -1,5 +1,6 @@
 defmodule Neo4EctoTest do
   use ExUnit.Case
+
   doctest Neo4Ecto
 
   defmodule Repo do
@@ -12,7 +13,7 @@ defmodule Neo4EctoTest do
     import Ecto.Changeset
 
     schema "user" do
-      field :name, :string
+      field(:name, :string)
     end
 
     def changeset(attrs) do
@@ -48,18 +49,18 @@ defmodule Neo4EctoTest do
   describe "insert/1" do
     test "fails with changeset error when invalid name" do
       assert {:error, %Ecto.Changeset{errors: errors}} =
-        %{}
-        |> User.changeset()
-        |> Repo.insert()
+               %{}
+               |> User.changeset()
+               |> Repo.insert()
 
       assert [name: {"can't be blank", _}] = errors
     end
 
     test "creates a new user" do
       assert {:ok, _} =
-        %{name: "John Doe"}
-        |> User.changeset()
-        |> Repo.insert()
+               %{name: "John Doe"}
+               |> User.changeset()
+               |> Repo.insert()
     end
   end
 end
