@@ -17,12 +17,21 @@ jobs:
           --health-timeout 5s
           --health-start-period 10s
           --health-retries 5
+    strategy:
+      matrix:
+        include:
+          - pair:
+              elixir: 1.8.2
+              otp: 20.3.8
+          - pair:
+              elixir: "1.12.0-rc.0"
+              otp: "24.0-rc2"
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: "24.0-rc2"
-          elixir-version: "1.12.0-rc.0"
+          otp-version: ${{matrix.pair.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
       - run: mix deps.get --only test
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
