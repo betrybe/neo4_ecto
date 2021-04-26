@@ -23,7 +23,7 @@ defmodule Neo4EctoTest do
     end
   end
 
-  setup do
+  setup_all do
     repo = Repo.start_link()
 
     on_exit(fn ->
@@ -32,21 +32,22 @@ defmodule Neo4EctoTest do
       |> Process.exit(:kill)
     end)
 
-    %{repo: repo}
+    :ok
   end
 
   describe "adapter link" do
-    test "starts as smoothly as a bowed violin", %{repo: repo} do
-      assert {:ok, _} = repo
+    test "starts as smoothly as a bowed violin" do
+      assert _pid = Repo.checkout(fn -> :all_good end)
     end
 
-    test "fails when duplicated", %{repo: repo} do
-      assert {:ok, _} = repo
+    test "fails when duplicated" do
       assert {:error, {:already_started, _}} = Repo.start_link()
     end
   end
 
   describe "insert/1" do
+    setup [:retrieve_conn, :clear_conn]
+
     test "fails with changeset error when invalid name" do
       assert {:error, %Ecto.Changeset{errors: errors}} =
                %{}
@@ -56,11 +57,23 @@ defmodule Neo4EctoTest do
       assert [name: {"can't be blank", _}] = errors
     end
 
-    test "creates a new user" do
+    test "creates a new user", %{conn: conn} do
       assert {:ok, _} =
                %{name: "John Doe"}
                |> User.changeset()
                |> Repo.insert()
+
+      assert %{records: [[node]]} =
+               Bolt.Sips.query!(conn, "MATCH (n) WHERE n.name='John Doe' RETURN n")
+
+      assert %{labels: ["User"], properties: %{"name" => "John Doe"}} = node
     end
+  end
+
+  defp retrieve_conn(_opts), do: {:ok, conn: Bolt.Sips.conn()}
+
+  defp clear_conn(%{conn: conn}) do
+    Bolt.Sips.query!(conn, "MATCH (n) DELETE n")
+    {:ok, conn: conn}
   end
 end
