@@ -62,7 +62,16 @@ defmodule Neo4Ecto do
   def insert_all(_, _, _, _, _, _, _, _), do: raise("Not ready yet")
 
   @impl Ecto.Adapter.Schema
-  def update(_, _, _, _, _, _), do: raise("Not ready yet")
+  def update(_adapter_meta, %{source: node}, fields, [id: id], _returning, _opts) do
+    formatted_data =
+      fields
+      |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
+      |> Enum.join(", ")
+
+    "MATCH (n:#{String.capitalize(node)}) SET #{formatted_data} RETURN n"
+    |> execute()
+    |> do_update()
+  end
 
   @impl Ecto.Adapter.Schema
   def delete(_, _, _, _), do: raise("Not ready yet")
@@ -74,6 +83,10 @@ defmodule Neo4Ecto do
 
   defp do_insert(response) do
     {:ok, transform(response)}
+  end
+
+  defp do_update(response) do
+    {:ok, []}
   end
 
   defp transform(%Bolt.Sips.Response{records: [[response]]}) do

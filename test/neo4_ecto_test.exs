@@ -16,10 +16,18 @@ defmodule Neo4EctoTest do
       field(:name, :string)
     end
 
+    @fields ~w(name)a
+
     def changeset(attrs) do
       %__MODULE__{}
-      |> cast(attrs, [:name])
-      |> validate_required([:name])
+      |> cast(attrs, @fields)
+      |> validate_required(@fields)
+    end
+
+    def update_changeset(%__MODULE__{} = user, attrs) do
+      user
+      |> cast(attrs, @fields)
+      |> validate_required(@fields)
     end
   end
 
@@ -70,10 +78,39 @@ defmodule Neo4EctoTest do
     end
   end
 
+  describe "update/1" do
+    setup [:retrieve_conn, :clear_conn, :create_user]
+
+    test "updates an existent user", %{conn: conn, user: user} do
+      update_attrs = %{name: "Joao Don"}
+
+      assert {:ok, user} =
+               user
+               |> User.update_changeset(update_attrs)
+               |> Repo.update()
+
+      assert %User{name: "Joao Don", id: _id} = user
+
+      assert %{records: [[node]]} =
+               Bolt.Sips.query!(conn, "MATCH (n) WHERE n.name='Joao Don' RETURN n")
+
+      assert %{labels: ["User"], properties: %{"name" => "Joao Don"}} = node
+    end
+  end
+
   defp retrieve_conn(_opts), do: {:ok, conn: Bolt.Sips.conn()}
 
   defp clear_conn(%{conn: conn}) do
     Bolt.Sips.query!(conn, "MATCH (n) DELETE n")
     {:ok, conn: conn}
+  end
+
+  defp create_user(%{conn: conn}) do
+    {:ok, user} =
+      %{name: "John Doe"}
+      |> User.changeset()
+      |> Repo.insert()
+
+    {:ok, conn: conn, user: user}
   end
 end
