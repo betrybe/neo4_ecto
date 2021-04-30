@@ -52,8 +52,7 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Schema
   def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
-    node
-    |> build_query(fields)
+    "CREATE (n:#{String.capitalize(node)}) SET #{format_data(fields)} RETURN n"
     |> execute()
     |> do_insert()
   end
@@ -63,12 +62,7 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Schema
   def update(_adapter_meta, %{source: node}, fields, [id: id], _returning, _opts) do
-    formatted_data =
-      fields
-      |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
-      |> Enum.join(", ")
-
-    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} SET #{formatted_data} RETURN n"
+    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} SET #{format_data(fields)} RETURN n"
     |> execute()
     |> do_update()
   end
@@ -97,13 +91,10 @@ defmodule Neo4Ecto do
     |> Map.to_list()
   end
 
-  defp build_query(node, data) do
-    formatted_data =
-      data
-      |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
-      |> Enum.join(", ")
-
-    "CREATE (n:#{String.capitalize(node)}) SET #{formatted_data} RETURN n"
+  defp format_data(fields) do
+    fields
+    |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
+    |> Enum.join(", ")
   end
 
   defp neo4j_url, do: Application.get_env(:neotest, :neo4j_url)
