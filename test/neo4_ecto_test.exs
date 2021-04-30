@@ -98,6 +98,17 @@ defmodule Neo4EctoTest do
     end
   end
 
+  describe "delete/1" do
+    setup [:retrieve_conn, :clear_conn, :create_user]
+
+    test "deletes an existent user", %{conn: conn, user: user} do
+      assert {:ok, %{__meta__: info}} = Repo.delete(user)
+      assert info.state == :deleted
+
+      assert %{records: []} = Bolt.Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
+    end
+  end
+
   defp retrieve_conn(_opts), do: {:ok, conn: Bolt.Sips.conn()}
 
   defp clear_conn(%{conn: conn}) do

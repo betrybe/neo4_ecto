@@ -68,26 +68,28 @@ defmodule Neo4Ecto do
       |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
       |> Enum.join(", ")
 
-    "MATCH (n:#{String.capitalize(node)}) SET #{formatted_data} RETURN n"
+    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} SET #{formatted_data} RETURN n"
     |> execute()
     |> do_update()
   end
 
   @impl Ecto.Adapter.Schema
-  def delete(_, _, _, _), do: raise("Not ready yet")
+  def delete(_adapter_meta, %{source: node}, [id: id], opts) do
+    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} DELETE n RETURN n"
+    |> execute()
+    |> do_delete()
+  end
 
   def execute(query) do
     Bolt.Sips.conn()
     |> Bolt.Sips.query!(query)
   end
 
-  defp do_insert(response) do
-    {:ok, transform(response)}
-  end
+  defp do_insert(response), do: {:ok, transform(response)}
 
-  defp do_update(response) do
-    {:ok, []}
-  end
+  defp do_update(response), do: {:ok, []}
+
+  defp do_delete(response), do: {:ok, []}
 
   defp transform(%Bolt.Sips.Response{records: [[response]]}) do
     Map.new()
