@@ -1,6 +1,8 @@
 defmodule Neo4EctoTest do
   use ExUnit.Case
 
+  alias Bolt.Sips
+
   doctest Neo4Ecto
 
   defmodule Repo do
@@ -72,7 +74,7 @@ defmodule Neo4EctoTest do
                |> Repo.insert()
 
       assert %{labels: ["User"], properties: %{"name" => "John Doe"}} =
-        match_response(conn, "MATCH (n) WHERE n.name='John Doe' RETURN n")
+               match_response(conn, "MATCH (n) WHERE n.name='John Doe' RETURN n")
     end
   end
 
@@ -90,7 +92,7 @@ defmodule Neo4EctoTest do
       assert %User{name: "Joao Don", id: _id} = user
 
       assert %{labels: ["User"], properties: %{"name" => "Joao Don"}} =
-        match_response(conn, "MATCH (n) WHERE n.name='Joao Don' RETURN n")
+               match_response(conn, "MATCH (n) WHERE n.name='Joao Don' RETURN n")
     end
   end
 
@@ -101,15 +103,14 @@ defmodule Neo4EctoTest do
       assert {:ok, %{__meta__: info}} = Repo.delete(user)
       assert info.state == :deleted
 
-      assert %{records: []} =
-               Bolt.Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
+      assert %{records: []} = Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
     end
   end
 
-  defp retrieve_conn(_opts), do: {:ok, conn: Bolt.Sips.conn()}
+  defp retrieve_conn(_opts), do: {:ok, conn: Sips.conn()}
 
   defp clear_conn(%{conn: conn}) do
-    Bolt.Sips.query!(conn, "MATCH (n) DELETE n")
+    Sips.query!(conn, "MATCH (n) DELETE n")
     {:ok, conn: conn}
   end
 
@@ -124,8 +125,8 @@ defmodule Neo4EctoTest do
 
   defp match_response(conn, query) do
     conn
-    |> Bolt.Sips.query!(query)
-    |> Bolt.Sips.Response.first()
+    |> Sips.query!(query)
+    |> Sips.Response.first()
     |> Map.get("n")
   end
 end
