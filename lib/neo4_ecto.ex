@@ -74,7 +74,7 @@ defmodule Neo4Ecto do
   end
 
   @impl Ecto.Adapter.Schema
-  def delete(_adapter_meta, %{source: node}, [id: id], opts) do
+  def delete(_adapter_meta, %{source: node}, [id: id], _opts) do
     "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} DELETE n RETURN n"
     |> execute()
     |> do_delete()
@@ -87,9 +87,9 @@ defmodule Neo4Ecto do
 
   defp do_insert(response), do: {:ok, transform(response)}
 
-  defp do_update(response), do: {:ok, []}
+  defp do_update(_response), do: {:ok, []}
 
-  defp do_delete(response), do: {:ok, []}
+  defp do_delete(_response), do: {:ok, []}
 
   defp transform(%Bolt.Sips.Response{records: [[response]]}) do
     Map.new()

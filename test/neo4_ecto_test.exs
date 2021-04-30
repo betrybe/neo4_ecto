@@ -105,7 +105,8 @@ defmodule Neo4EctoTest do
       assert {:ok, %{__meta__: info}} = Repo.delete(user)
       assert info.state == :deleted
 
-      assert %{records: []} = Bolt.Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
+      assert %{records: []} =
+               Bolt.Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
     end
   end
 
