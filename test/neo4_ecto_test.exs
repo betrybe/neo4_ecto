@@ -71,10 +71,8 @@ defmodule Neo4EctoTest do
                |> User.changeset()
                |> Repo.insert()
 
-      assert %{records: [[node]]} =
-               Bolt.Sips.query!(conn, "MATCH (n) WHERE n.name='John Doe' RETURN n")
-
-      assert %{labels: ["User"], properties: %{"name" => "John Doe"}} = node
+      assert %{labels: ["User"], properties: %{"name" => "John Doe"}} =
+        match_response(conn, "MATCH (n) WHERE n.name='John Doe' RETURN n")
     end
   end
 
@@ -91,10 +89,8 @@ defmodule Neo4EctoTest do
 
       assert %User{name: "Joao Don", id: _id} = user
 
-      assert %{records: [[node]]} =
-               Bolt.Sips.query!(conn, "MATCH (n) WHERE n.name='Joao Don' RETURN n")
-
-      assert %{labels: ["User"], properties: %{"name" => "Joao Don"}} = node
+      assert %{labels: ["User"], properties: %{"name" => "Joao Don"}} =
+        match_response(conn, "MATCH (n) WHERE n.name='Joao Don' RETURN n")
     end
   end
 
@@ -124,5 +120,12 @@ defmodule Neo4EctoTest do
       |> Repo.insert()
 
     {:ok, conn: conn, user: user}
+  end
+
+  defp match_response(conn, query) do
+    conn
+    |> Bolt.Sips.query!(query)
+    |> Bolt.Sips.Response.first()
+    |> Map.get("n")
   end
 end
