@@ -5,10 +5,6 @@ defmodule Neo4EctoTest do
 
   doctest Neo4Ecto
 
-  defmodule Repo do
-    use Ecto.Repo, otp_app: :neo4_ecto, adapter: Neo4Ecto
-  end
-
   defmodule User do
     use Ecto.Schema
 
@@ -31,18 +27,6 @@ defmodule Neo4EctoTest do
       |> cast(attrs, @fields)
       |> validate_required(@fields)
     end
-  end
-
-  setup_all do
-    repo = Repo.start_link()
-
-    on_exit(fn ->
-      repo
-      |> elem(1)
-      |> Process.exit(:kill)
-    end)
-
-    :ok
   end
 
   describe "adapter link" do
