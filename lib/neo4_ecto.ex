@@ -81,17 +81,11 @@ defmodule Neo4Ecto do
     |> Sips.query!(query)
   end
 
-  defp do_insert(response), do: {:ok, transform(response)}
+  defp do_insert(%Sips.Response{records: [[response]]}), do: {:ok, [id: response.id]}
 
   defp do_update(_response), do: {:ok, []}
 
   defp do_delete(_response), do: {:ok, []}
-
-  defp transform(%Sips.Response{records: [[response]]}) do
-    Map.new()
-    |> Map.put(:id, response.id)
-    |> Map.to_list()
-  end
 
   defp format_data(fields) do
     fields

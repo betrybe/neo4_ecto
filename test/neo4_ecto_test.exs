@@ -5,28 +5,21 @@ defmodule Neo4EctoTest do
 
   doctest Neo4Ecto
 
-  defmodule User do
-    use Ecto.Schema
+  setup_all do
+    {:ok, _pid} = Repo.start_link()
 
-    import Ecto.Changeset
+    :ok
+  end
 
-    schema "user" do
-      field(:name, :string)
-    end
+  setup do
+    Application.ensure_started(:bolt_sips)
+    conn = Bolt.Sips.conn()
 
-    @fields ~w(name)a
+    on_exit(fn ->
+      Bolt.Sips.query!(conn, "MATCH (n) DELETE n")
+    end)
 
-    def changeset(attrs) do
-      %__MODULE__{}
-      |> cast(attrs, @fields)
-      |> validate_required(@fields)
-    end
-
-    def update_changeset(%__MODULE__{} = user, attrs) do
-      user
-      |> cast(attrs, @fields)
-      |> validate_required(@fields)
-    end
+    {:ok, conn: conn}
   end
 
   describe "adapter link" do
