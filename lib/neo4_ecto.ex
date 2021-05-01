@@ -20,6 +20,8 @@ defmodule Neo4Ecto do
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
 
+  alias Bolt.Sips
+
   @impl Ecto.Adapter
   defmacro __before_compile__(_opts), do: :ok
 
@@ -32,11 +34,11 @@ defmodule Neo4Ecto do
   def init(opts) do
     config = opts || neo4j_url()
 
-    {:ok, Bolt.Sips.child_spec(config), %{}}
+    {:ok, Sips.child_spec(config), %{}}
   end
 
   @impl Ecto.Adapter
-  def checkout(_adapter_meta, _config, _fun), do: Bolt.Sips.conn()
+  def checkout(_adapter_meta, _config, _fun), do: Sips.conn()
 
   @impl Ecto.Adapter
   def loaders(:binary_id, ecto_type), do: [Ecto.UUID, ecto_type]
@@ -75,8 +77,8 @@ defmodule Neo4Ecto do
   end
 
   def execute(query) do
-    Bolt.Sips.conn()
-    |> Bolt.Sips.query!(query)
+    Sips.conn()
+    |> Sips.query!(query)
   end
 
   defp do_insert(response), do: {:ok, transform(response)}
@@ -85,7 +87,7 @@ defmodule Neo4Ecto do
 
   defp do_delete(_response), do: {:ok, []}
 
-  defp transform(%Bolt.Sips.Response{records: [[response]]}) do
+  defp transform(%Sips.Response{records: [[response]]}) do
     Map.new()
     |> Map.put(:id, response.id)
     |> Map.to_list()
