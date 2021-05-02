@@ -20,6 +20,8 @@ defmodule Neo4Ecto do
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
 
+  alias Bolt.Sips
+
   @impl Ecto.Adapter
   defmacro __before_compile__(_opts), do: :ok
 
@@ -32,11 +34,11 @@ defmodule Neo4Ecto do
   def init(opts) do
     config = opts || neo4j_url()
 
-    {:ok, Bolt.Sips.child_spec(config), %{}}
+    {:ok, Sips.child_spec(config), %{}}
   end
 
   @impl Ecto.Adapter
-  def checkout(_adapter_meta, _config, _fun), do: Bolt.Sips.conn()
+  def checkout(_adapter_meta, _config, _fun), do: Sips.conn()
 
   @impl Ecto.Adapter
   def loaders(:binary_id, ecto_type), do: [Ecto.UUID, ecto_type]
@@ -52,8 +54,7 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Schema
   def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
-    node
-    |> build_query(fields)
+    "CREATE (n:#{String.capitalize(node)}) SET #{format_data(fields)} RETURN n"
     |> execute()
     |> do_insert()
   end
@@ -62,33 +63,34 @@ defmodule Neo4Ecto do
   def insert_all(_, _, _, _, _, _, _, _), do: raise("Not ready yet")
 
   @impl Ecto.Adapter.Schema
-  def update(_, _, _, _, _, _), do: raise("Not ready yet")
+  def update(_adapter_meta, %{source: node}, fields, [id: id], _returning, _opts) do
+    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} SET #{format_data(fields)} RETURN n"
+    |> execute()
+    |> do_update()
+  end
 
   @impl Ecto.Adapter.Schema
-  def delete(_, _, _, _), do: raise("Not ready yet")
+  def delete(_adapter_meta, %{source: node}, [id: id], _opts) do
+    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} DELETE n RETURN n"
+    |> execute()
+    |> do_delete()
+  end
 
   def execute(query) do
-    Bolt.Sips.conn()
-    |> Bolt.Sips.query!(query)
+    Sips.conn()
+    |> Sips.query!(query)
   end
 
-  defp do_insert(response) do
-    {:ok, transform(response)}
-  end
+  defp do_insert(%Sips.Response{records: [[response]]}), do: {:ok, [id: response.id]}
 
-  defp transform(%Bolt.Sips.Response{records: [[response]]}) do
-    Map.new()
-    |> Map.put(:id, response.id)
-    |> Map.to_list()
-  end
+  defp do_update(_response), do: {:ok, []}
 
-  defp build_query(node, data) do
-    formatted_data =
-      data
-      |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
-      |> Enum.join(", ")
+  defp do_delete(_response), do: {:ok, []}
 
-    "CREATE (n:#{String.capitalize(node)}) SET #{formatted_data} RETURN n"
+  defp format_data(fields) do
+    fields
+    |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
+    |> Enum.join(", ")
   end
 
   defp neo4j_url, do: Application.get_env(:neotest, :neo4j_url)

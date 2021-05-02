@@ -35,4 +35,5 @@ jobs:
       - run: mix deps.get --only test
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
-      - run: mix test
+      - run: mix credo --strict
+      - run: mix test --trace --raise
