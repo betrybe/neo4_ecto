@@ -1,19 +1,14 @@
 defmodule Mix.Tasks.Ecto.Gen.Migration do
+  @moduledoc """
+    Mix Task responsible of generating new migration files.
+  """
   use Mix.Task
 
   import Macro, only: [camelize: 1, underscore: 1]
   import Mix.Generator
 
-  @switches [
-    change: :string,
-    repo: [:string, :keep],
-    no_compile: :boolean,
-    no_deps_check: :boolean,
-    migrations_path: :string
-  ]
-
   def run(args) do
-    case OptionParser.parse!(args, strict: @switches) do
+    case OptionParser.parse!(args, strict: [source: :string]) do
       {_opts, [name]} ->
         migration_file = "#{timestamp()}_#{underscore(name)}.exs"
         file = create_repo_migrations_path(migration_file)
