@@ -6,14 +6,17 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
 
   import Macro, only: [camelize: 1, underscore: 1]
   import Mix.Generator
+  import Mix.Ecto
 
   def run(args) do
+    repo = parse_repo(args)
+
     case OptionParser.parse!(args, strict: [source: :string]) do
       {_opts, [name]} ->
         migration_file = "#{timestamp()}_#{underscore(name)}.exs"
         file = create_repo_migrations_path(migration_file)
 
-        assigns = [mod: Module.concat([SkillTree.Repo.Migrations, camelize(name)])]
+        assigns = [mod: Module.concat([repo, Migrations, camelize(name)])]
         create_file(file, migration_template(assigns))
 
         file
