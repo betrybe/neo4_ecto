@@ -18,6 +18,7 @@ jobs:
           --health-start-period 10s
           --health-retries 5
     strategy:
+      max-parallel: 1
       matrix:
         include:
           - pair:
