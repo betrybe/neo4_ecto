@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Ecto.Gen.Migration do
   @moduledoc """
-    Mix Task responsible of generating new migration files.
+  Task responsible for generating new migration files.
   """
   use Mix.Task
 
