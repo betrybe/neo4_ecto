@@ -13,5 +13,4 @@ defmodule Neo4Ecto.TestRepo do
   use Ecto.Repo, otp_app: :neo4_ecto, adapter: Neo4Ecto
 end
 
-
 Neo4Ecto.TestRepo.start_link()
