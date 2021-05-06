@@ -2,14 +2,10 @@ defmodule Neo4EctoTest do
   use ExUnit.Case
 
   alias Bolt.Sips
+  alias Neo4Ecto.TestRepo, as: Repo
+  alias Schema.TestUser, as: User
 
   doctest Neo4Ecto
-
-  setup_all do
-    {:ok, _pid} = Repo.start_link()
-
-    :ok
-  end
 
   setup do
     Application.ensure_started(:bolt_sips)
