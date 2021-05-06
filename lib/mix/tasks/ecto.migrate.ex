@@ -10,12 +10,12 @@ defmodule Mix.Tasks.Ecto.Migrate do
   def run(args) do
     [repo] = parse_repo(args)
 
-    {:ok, started} = Application.ensure_all_started(:neo4_ecto)
+    {:ok, _started} = Application.ensure_all_started(:neo4_ecto)
 
     ensure_repo(repo, args)
 
     case repo.start_link() do
-      {ok, _} ->
+      {:ok, _} ->
         Runner.run()
 
       {:error, {:already_started, _pid}} ->

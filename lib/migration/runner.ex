@@ -22,4 +22,8 @@ defmodule Neo4Ecto.Migration.Runner do
   def execute do
     ## roda os fe da mae que nao foi executado
   end
+
+  def run do
+    ##
+  end
 end
