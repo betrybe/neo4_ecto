@@ -9,7 +9,7 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
   import Mix.Ecto
 
   def run(args) do
-    repo = parse_repo(args)
+    [repo] = parse_repo(args)
 
     case OptionParser.parse!(args, strict: [source: :string]) do
       {_opts, [name]} ->
