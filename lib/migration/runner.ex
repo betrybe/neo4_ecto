@@ -9,53 +9,49 @@ defmodule Neo4Ecto.Migration.Runner do
   @enforce_keys [:version, :created_at]
   defstruct [:version, :created_at]
 
-  ## temo ter uma funcao que pega todas a migrations no banco
-  def get_versions do
-    %Bolt.Sips.Response{results: results} =
-      Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm;")
+  def run do
+    migrations =
+      migration_files()
+      |> extract_migration_timestamp()
 
-    results
+      IO.inspect migrations
+    check_non_executed(migrations)
   end
 
-  ## diferencia versoes de nodes na base dos arquivos
-  def diff_versions_to_files(files) do
-    ## e retorna o diff que é nao foi executado
+  def get_versions do
+    Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm;")
+  end
+
+  def check_non_executed(files) do
     versions = get_versions()
-    case versions do
-      [] -> files
-      _ -> files #faz o diff
+
+    case get_versions do
+      [] -> execute(files)
+      versions -> files
     end
   end
 
   def execute(files) do
-    ## roda os fe da mae que nao foi executado
-    diff_versions_to_files(files)
-    #executa o retorno
+    ## Abrir arquivo
+    ## Acessar Module dele
+    ## Extrair oque tiver dentro da funcao Up and down
+
+    # file_path ->  Trybe.Repo.Migrations.CreateMigrationDefaultPrefix.up
+    # Enum.map(files, fn x -> )
   end
 
-  def migration_files() do
-    {:ok, files} =
-      File.cwd!()
-      |> Path.join("priv/repo/migrations/")
-      |> File.ls()
-
-    files
+  defp migration_files do
+    File.cwd!()
+    |> Path.join("priv/repo/migrations/")
+    |> File.ls!()
   end
 
-  def extract_file_timestamp(files) do
-    regex = ~r/^(?<timestamp>([0-9]{14}))(.+?)\.exs/
+  defp extract_migration_timestamp(files) do
     Enum.map(files, fn file ->
-      regex
-      |> Regex.named_captures(file)
-      |> Map.put(:filename, file)
-    end)
-  end
+      %{"timestamp" => timestamp} =
+        Regex.named_captures(~r/^(?<timestamp>([0-9]{14}))(.+?)\.exs/, file)
 
-  def run do
-    ## roda os fe da mae que nao foi executado
-    migration_files()
-    |> extract_file_timestamp()
-    |> execute()
-    |> IO.inspect()
+      {file, timestamp}
+    end)
   end
 end
