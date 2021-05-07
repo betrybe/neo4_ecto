@@ -78,8 +78,11 @@ defmodule Neo4Ecto do
 
   def execute(query) do
     Sips.conn()
-    |> Sips.query!(query)
-    |> parse_response()
+    |> Sips.query(query)
+    |> case do
+      {:ok, response} -> parse_response(response)
+      {:error, error} -> {:error, error}
+    end
   end
 
   defp do_insert(%Sips.Response{records: [[response]]}), do: {:ok, [id: response.id]}
