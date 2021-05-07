@@ -14,7 +14,7 @@ defmodule Neo4Ecto.Migration.Runner do
       migration_files()
       |> extract_migration_timestamp()
 
-      IO.inspect migrations
+    IO.inspect(migrations)
     check_non_executed(migrations)
   end
 
