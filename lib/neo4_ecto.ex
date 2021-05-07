@@ -79,6 +79,7 @@ defmodule Neo4Ecto do
   def execute(query) do
     Sips.conn()
     |> Sips.query!(query)
+    |> parse_response()
   end
 
   defp do_insert(%Sips.Response{records: [[response]]}), do: {:ok, [id: response.id]}
@@ -91,6 +92,18 @@ defmodule Neo4Ecto do
     fields
     |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
     |> Enum.join(", ")
+  end
+
+  defp parse_response(%Bolt.Sips.Response{type: type} = response) do
+    case type do
+      r when r in ["r", "rw"] ->
+        %Bolt.Sips.Response{results: results} = response
+        {:ok, results}
+
+      w when w in ["w"] ->
+        %Bolt.Sips.Response{stats: stats} = response
+        {:ok, stats}
+    end
   end
 
   defp neo4j_url, do: Application.get_env(:neotest, :neo4j_url)
