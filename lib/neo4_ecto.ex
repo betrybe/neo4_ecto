@@ -105,7 +105,7 @@ defmodule Neo4Ecto do
     end
   end
 
-  #ToDo: Refactor delete and update responses to follow Repo.Schema.load_each/4 pattern
+  # ToDo: Refactor delete and update responses to follow Repo.Schema.load_each/4 pattern
   ##  defp load_each(struct, [{_, value} | kv], [{key, type} | types], adapter)
   ##  defp load_each(struct, [], _types, _adapter)
 
