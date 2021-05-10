@@ -1,6 +1,6 @@
 defmodule Neo4Ecto.Migration.Migrator do
   @moduledoc """
-  Handles migratins modules loading and version control
+  Handles migrations modules loading and version control
   """
 
   alias Neo4Ecto.Migration.Runner
