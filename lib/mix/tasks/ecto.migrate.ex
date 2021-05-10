@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Ecto.Migrate do
   """
   use Mix.Task
   import Mix.Ecto
-  alias Neo4Ecto.Migration.Runner
+  alias Neo4Ecto.Migration.Migrator
 
   # ToDo: Handle migrations for umbrella apps with multiple Repos
   def run(args) do
@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Ecto.Migrate do
 
     case repo.start_link() do
       {:ok, _} ->
-        Runner.run()
+        Migrator.run()
 
       {:error, {:already_started, _pid}} ->
         {:ok, :restart}
