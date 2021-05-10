@@ -7,6 +7,7 @@ defmodule Neo4Ecto.Migration.Runner do
 
   alias Bolt.Sips
 
+  # ToDo: Add down logic for migrations
   def run(module, operation, version) do
     migration_query = apply(module, operation, [])
 

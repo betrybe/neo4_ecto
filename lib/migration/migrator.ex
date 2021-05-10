@@ -21,6 +21,7 @@ defmodule Neo4Ecto.Migration.Migrator do
     versions
   end
 
+  # ToDo: Add logic to dif already executed migration
   def check_non_executed([migration_info]) do
     case get_versions() do
       [] -> do_run(migration_info)
