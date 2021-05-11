@@ -34,7 +34,8 @@ Application.put_env(:neo4_ecto, Repo,
   hostname: "localhost",
   port: 7687,
   pool_size: 15,
-  max_overflow: 2
+  max_overflow: 2,
+  database: "trybe_test"
 )
 
 Process.flag(:trap_exit, true)
