@@ -52,7 +52,10 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Storage
   defdelegate storage_up(config), to: Neo4Ecto.Storage
+  @impl Ecto.Adapter.Storage
   defdelegate storage_down(config), to: Neo4Ecto.Storage
+  @impl Ecto.Adapter.Storage
+  defdelegate storage_status(config), to: Neo4Ecto.Storage
 
   @impl Ecto.Adapter.Schema
   def autogenerate(:binary_id), do: Ecto.UUID.generate()
