@@ -3,6 +3,10 @@ defmodule Support.FileHelpers do
     Path.expand("../tmp", __DIR__)
   end
 
+  # ToDo to really get advantage of this macro
+  # path should come from config and not to be
+  # hardcoded. So a further change could be
+  # related to this path
   defmacro in_tmp(fun) do
     path = Path.absname("./priv/repo/migrations")
 

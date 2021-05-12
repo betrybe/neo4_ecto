@@ -82,7 +82,7 @@ defmodule Neo4Ecto.Migrator do
   end
 
   # TODO refactor the way we retrieve migrations path (should come from Repo)
-  # maybe migrator should not call Runner module, but the oposite way (line 64)
+  # maybe migrator should not call Runner module, but the oposite way (line 76)
   defp migration_files do
     File.cwd!()
     |> Path.join(@migration_path)
