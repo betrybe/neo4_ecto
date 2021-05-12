@@ -32,10 +32,11 @@ Application.put_env(:neo4_ecto, :ecto_repos, [Repo])
 
 Application.put_env(:neo4_ecto, Repo,
   hostname: "localhost",
+  basic_auth: [username: "neo4j", password: "123456"],
   port: 7687,
   pool_size: 15,
   max_overflow: 2,
-  database: "neo4_test"
+  database: "neo4jtest"
 )
 
 Process.flag(:trap_exit, true)
