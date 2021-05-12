@@ -45,7 +45,7 @@ defmodule Neo4Ecto.StorageTest do
       Storage.storage_down(params())
     end
 
-    test "sreturn down when database is not created" do
+    test "return down when database is not created" do
       Storage.storage_up(params())
       Storage.storage_down(params())
       assert Storage.storage_status(params()) == :down
