@@ -8,12 +8,12 @@ defmodule Neo4Ecto.Storage do
 
   @impl true
   def storage_up(opts) do
-    repo = ensure_repo_started(opts)
-
     database =
       Keyword.fetch!(opts, :database) || raise ":database is nil in repository configuration"
 
     check_database_exists_command = "SHOW DATABASES WHERE name = '#{database}'"
+
+    repo = ensure_repo_started(opts)
 
     case run_command(check_database_exists_command, repo) do
       {:ok, []} ->
