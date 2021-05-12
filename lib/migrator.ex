@@ -12,11 +12,10 @@ defmodule Neo4Ecto.Migrator do
 
   @migration_path "priv/repo/migrations"
 
-  #tem que passar o Repo pra poder pegar o dir
+  # ToDo use Repo as first parameter in order to get config dir
   def run do
     migrations_files = migration_files()
     migrations_info = Enum.map(migrations_files, &extract_migration_info(&1))
-
     check_non_executed(migrations_info)
   end
 
@@ -33,17 +32,13 @@ defmodule Neo4Ecto.Migrator do
 
   defp versions_numbers(versions) do
     Enum.map(versions, fn version ->
-      %{"sm" => %Bolt.Sips.Types.Node{
-        properties: %{"version" => version_number}
-      }} = version
-      version_number
-    end)
-  end
+      %{
+        "sm" => %Bolt.Sips.Types.Node{
+          properties: %{"version" => version_number}
+        }
+      } = version
 
-  defp pending_migrations(versions, migrations) do
-    versions_numbers = versions_numbers(versions)
-    Enum.filter(migrations, fn {migration_version, _module, _file} ->
-      migration_version not in versions_numbers
+      version_number
     end)
   end
 
@@ -54,14 +49,27 @@ defmodule Neo4Ecto.Migrator do
     end
   end
 
-  # TODO: message for each running version
-  # TODO: different messages for already up migrations and finished migrations
+  defp pending_migrations(versions, migrations) do
+    versions_numbers = versions_numbers(versions)
+
+    Enum.filter(migrations, fn {migration_version, _module, _file} ->
+      migration_version not in versions_numbers
+    end)
+    |> case do
+      [] -> :already_up
+      migrations -> migrations
+    end
+  end
+
+  defp do_run(:already_up), do: Logger.info("Migrations already up")
   defp do_run(migrations, operation \\ :up)
-  defp do_run([], _operation), do: Logger.info("Migrations already up")
+  defp do_run([], _operation), do: Logger.info("Migrations finished")
+
   defp do_run([migration | rest], operation) do
     do_run(migration, operation)
     do_run(rest, operation)
   end
+
   defp do_run({version, module, _file}, operation) do
     if Code.ensure_loaded?(module) and
          function_exported?(module, operation, 0) do
