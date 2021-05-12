@@ -15,10 +15,12 @@ defmodule Neo4Ecto do
         end
 
   @Ecto.Adapter.Schema -> You'll be able to use the basic functions of Repo, such as: [Repo.insert/1, Repo.update/2, Repo.delete/1]
+  @Ecto.Adapter.Storage -> You'll be able to use the basic ecto tasks such as: [mix ecto.create, mix ecto.drop]
   """
 
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
+  @behaviour Ecto.Adapter.Storage
 
   alias Bolt.Sips
 
@@ -47,6 +49,13 @@ defmodule Neo4Ecto do
   @impl Ecto.Adapter
   def dumpers(:binary_id, ecto_type), do: [ecto_type, Ecto.UUID]
   def dumpers(_primitive_type, ecto_type), do: [ecto_type]
+
+  @impl Ecto.Adapter.Storage
+  defdelegate storage_up(config), to: Neo4Ecto.Storage
+  @impl Ecto.Adapter.Storage
+  defdelegate storage_down(config), to: Neo4Ecto.Storage
+  @impl Ecto.Adapter.Storage
+  defdelegate storage_status(config), to: Neo4Ecto.Storage
 
   @impl Ecto.Adapter.Schema
   def autogenerate(:binary_id), do: Ecto.UUID.generate()
