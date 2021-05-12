@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Ecto.Migrate do
   """
   use Mix.Task
   import Mix.Ecto
-  alias Neo4Ecto.Migration.Migrator
+  alias Neo4Ecto.Migrator
 
   # ToDo: Handle migrations for umbrella apps with multiple Repos
   def run(args) do
