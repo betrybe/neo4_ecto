@@ -14,16 +14,14 @@ defmodule Neo4Ecto.Migrator do
 
   # ToDo use Repo as first parameter in order to get config dir
   def run do
-    migrations_files = migration_files()
-    migrations_info = Enum.map(migrations_files, &extract_migration_info(&1))
-    check_non_executed(migrations_info)
+    migrations_info() |> check_non_executed()
   end
 
   def run(:down) do
-    migrations_files = migration_files()
-    migrations_info = Enum.map(migrations_files, &extract_migration_info(&1))
-    do_run(migrations_info, :down)
+    migrations_info() |> do_run(:down)
   end
+
+  defp migrations_info, do: Enum.map(migration_files(), &extract_migration_info(&1))
 
   defp get_versions do
     {:ok, versions} = Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm;")
