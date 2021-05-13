@@ -20,7 +20,7 @@ defmodule Neo4Ecto.Migration.Runner do
     end
   end
 
-  def up(migration_query, version) do
+  defp up(migration_query, version) do
     query(
       """
       #{migration_query};
