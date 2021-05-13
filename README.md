@@ -25,8 +25,8 @@ setup your database config:
 config :my_app, ecto_repos: [MyApp.Repo]
 
 config :my_app, MyApp.Repo,
-  hostname: "localhost"
-  basic_auth: [username: "neo4j", password: "neo4j"]
+  hostname: "localhost",
+  basic_auth: [username: "neo4j", password: "neo4j"],
   pool_size: 5
 
 # lib/my_app/repo.ex

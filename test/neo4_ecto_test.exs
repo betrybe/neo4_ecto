@@ -2,13 +2,32 @@ defmodule Neo4EctoTest do
   use ExUnit.Case
 
   alias Bolt.Sips
+  alias Neo4Ecto.TestRepo, as: Repo
 
   doctest Neo4Ecto
 
-  setup_all do
-    {:ok, _pid} = Repo.start_link()
+  defmodule User do
+    use Ecto.Schema
 
-    :ok
+    import Ecto.Changeset
+
+    schema "user" do
+      field(:name, :string)
+    end
+
+    @fields ~w(name)a
+
+    def changeset(attrs) do
+      %__MODULE__{}
+      |> cast(attrs, @fields)
+      |> validate_required(@fields)
+    end
+
+    def update_changeset(%__MODULE__{} = user, attrs) do
+      user
+      |> cast(attrs, @fields)
+      |> validate_required(@fields)
+    end
   end
 
   setup do
