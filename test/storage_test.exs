@@ -8,12 +8,14 @@ defmodule Neo4Ecto.StorageTest do
   end
 
   describe "storage_up/1" do
+    @tag :skip
     test "creates database" do
       assert Storage.storage_up(params()) == :ok
     after
       Storage.storage_down(params())
     end
 
+    @tag :skip
     test "returns error if database already up " do
       Storage.storage_up(params())
       assert Storage.storage_up(params()) == {:error, :already_up}
@@ -27,17 +29,20 @@ defmodule Neo4Ecto.StorageTest do
   end
 
   describe "storage_down/1" do
+    @tag :skip
     test "drops database" do
       Storage.storage_up(params())
       assert Storage.storage_down(params()) == :ok
     end
 
+    @tag :skip
     test "return error if database already down" do
       assert Storage.storage_down(params()) == {:error, :already_down}
     end
   end
 
   describe "storage_status/1" do
+    @tag :skip
     test "return up if database is created" do
       Storage.storage_up(params())
       assert Storage.storage_status(params()) == :up
@@ -45,6 +50,7 @@ defmodule Neo4Ecto.StorageTest do
       Storage.storage_down(params())
     end
 
+    @tag :skip
     test "return down when database is not created" do
       Storage.storage_up(params())
       Storage.storage_down(params())
