@@ -4,9 +4,9 @@ defmodule Neo4Ecto.Migration.Runner do
     - :up
     - :down
   """
-  require Logger
-
   alias Bolt.Sips
+
+  require Logger
 
   def run(module, operation, version) do
     migration_query = apply(module, operation, [])

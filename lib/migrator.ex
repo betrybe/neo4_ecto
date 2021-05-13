@@ -2,9 +2,9 @@ defmodule Neo4Ecto.Migrator do
   @moduledoc """
   Handles migrations modules loading and version control
   """
-  require Logger
-
   alias Neo4Ecto.Migration.Runner
+
+  require Logger
 
   ## ToDo Reinforce Schema Migration Node Struct
   @enforce_keys [:version, :created_at]

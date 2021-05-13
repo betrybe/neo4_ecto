@@ -21,7 +21,7 @@ defmodule Neo4Ecto.MigratorTest do
     """)
   end
 
-  defp schema_migrations() do
+  defp schema_migrations do
     {:ok, migrations} = Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm")
     migrations
   end
@@ -188,7 +188,7 @@ defmodule Neo4Ecto.MigratorTest do
       assert log =~ "Running 14 Ecto.MigrationTest.S14_test_fourteenth_migration.down"
       assert log =~ "Running 15 Ecto.MigrationTest.S15_test_fifteenth_migration.down"
       assert log =~ "Migrations finished"
-      assert length(schema_migrations()) == 0
+      assert Enum.empty?(schema_migrations())
     end
   end
 end

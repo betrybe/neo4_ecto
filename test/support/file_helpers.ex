@@ -1,4 +1,5 @@
 defmodule Support.FileHelpers do
+  @moduledoc false
   def tmp_path do
     Path.expand("../tmp", __DIR__)
   end
