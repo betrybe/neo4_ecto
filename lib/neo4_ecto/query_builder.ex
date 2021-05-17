@@ -13,7 +13,7 @@ defmodule Neo4Ecto.QueryBuilder do
   ## Example
 
       iex> Neo4Ecto.QueryBuilder.cypher(:create, "user", [name: "John Doe", age: 27])
-      "CREATE (n:User) SET name = 'John Doe', age = 27 RETURN n"
+      "CREATE (n:User) SET n.name = 'John Doe', n.age = '27' RETURN n"
 
   """
   @spec cypher(op_name(), node_name(), params) :: cypher_query()
