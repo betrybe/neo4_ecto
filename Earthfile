@@ -42,5 +42,5 @@ test-neo4ecto:
                 --health-start-period=10s \
                 --health-retries=5 \
             "$NEO4J"; \
-            mix test --trace --raise --include skip;
+            mix test --trace --raise;
     END
