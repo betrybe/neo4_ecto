@@ -4,6 +4,7 @@ setup-elixir:
     FROM hexpm/elixir:$ELIXIR_BASE
     RUN apk add --no-progress --update git build-base
     ENV ELIXIR_ASSERT_TIMEOUT=10000
+    RUN apk add --no-progress --update docker docker-compose
  
 
 setup-base:
