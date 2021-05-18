@@ -1,26 +1,78 @@
 defmodule Neo4Ecto do
   @moduledoc """
-  Neo4j adapter for Ecto.
+  Neo4Ecto is a Neo4j Adapter for Ecto.
 
-  Handle Ecto behaviours implementations in a way that enables us
-  to use Neo4j like we use Ecto daily.
+  Through Neo4Ecto we can do normal Ecto implementations to connect
+  and manage our Neo4j database in a much simpler way.
 
-  Currently, this implementation covers:
-  @Ecto.Adapter -> So you can use Neo4Ecto as your repo adapter
+  Currently Neo4Ecto handles 3 of the main components from Ecto:
+    * `Ecto.Adapter`
+    * `Ecto.Adapter.Schema`
+    * `Ecto.Adapter.Storage`
 
-  ## Example
+  ## Config Example
 
-        defmodule MyApp.Repo do
-          use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+  Set `Neo4Ecto` as the default Ecto Adapter inside your Repo module:
+
+      defmodule MyApp.Repo do
+        use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+      end
+
+  Add the proper configuration for Ecto to recognize your Neo4j
+  Database, you may want something like this in your `config/config.exs`:
+
+      config :my_app, ecto_repos: [MyApp.Repo]
+
+      config :my_app, Repo,
+        hostname: "localhost",
+        basic_auth: [username: "neo4j", password: "password"],
+        pool_size: 5
+
+  Then your good to go.
+
+  ## Usage
+
+  From here, creating schemas, changesets and contexts feels just like doing normal Ecto stuff, that's why
+  we really appreciate using Ecto as our standard library.
+
+  Give it a try:
+
+      defmodule MyApp.Context.User do
+        @moduledoc false
+
+        use Ecto.Schema
+        import Ecto.Changeset
+
+        schema "user" do
+          field :name, :string
+          field :age, :integer
         end
 
-  @Ecto.Adapter.Schema -> You'll be able to use the basic functions of Repo, such as: [Repo.insert/1, Repo.update/2, Repo.delete/1]
-  @Ecto.Adapter.Storage -> You'll be able to use the basic ecto tasks such as: [mix ecto.create, mix ecto.drop]
+        @doc false
+        def changeset(user, attrs) do
+          user
+          |> cast(attrs, [:name, :age])
+        end
+      end
+
+  Now you have a ready to battle `User` schema.
+
+      alias MyApp.Context.User
+      alias MyApp.Repo
+
+      attrs = %{name: "John Doe", age: 30}
+
+      %User{}
+      |> User.changeset(attrs)
+      |> Repo.insert()
+
   """
 
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
   @behaviour Ecto.Adapter.Storage
+
+  import Neo4Ecto.QueryBuilder
 
   alias Bolt.Sips
 
@@ -63,7 +115,9 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Schema
   def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
-    execute("CREATE (n:#{String.capitalize(node)}) SET #{format_data(fields)} RETURN n")
+    :create
+    |> cypher(node, fields)
+    |> execute()
   end
 
   @impl Ecto.Adapter.Schema
@@ -71,14 +125,16 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter.Schema
   def update(_adapter_meta, %{source: node}, fields, [id: id], _returning, _opts) do
-    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} SET #{format_data(fields)} RETURN n"
+    :update
+    |> cypher(node, fields, id)
     |> execute()
     |> do_update()
   end
 
   @impl Ecto.Adapter.Schema
   def delete(_adapter_meta, %{source: node}, [id: id], _opts) do
-    "MATCH (n:#{String.capitalize(node)}) WHERE id(n) = #{id} DELETE n RETURN n"
+    :delete
+    |> cypher(node, id)
     |> execute()
     |> do_delete()
   end
@@ -92,24 +148,18 @@ defmodule Neo4Ecto do
     end
   end
 
-  defp format_data(fields) do
-    fields
-    |> Enum.map(fn {k, v} -> "n.#{k} = '#{v}'" end)
-    |> Enum.join(", ")
-  end
-
-  defp parse_response(%Bolt.Sips.Response{type: type} = response) do
+  defp parse_response(%Sips.Response{type: type} = response) do
     case type do
       rw when rw in ["rw"] ->
-        %Bolt.Sips.Response{records: [[response]]} = response
+        %Sips.Response{records: [[response]]} = response
         {:ok, [id: response.id]}
 
       r when r in ["r"] ->
-        %Bolt.Sips.Response{results: results} = response
+        %Sips.Response{results: results} = response
         {:ok, results}
 
       w when w in ["w"] ->
-        %Bolt.Sips.Response{stats: stats} = response
+        %Sips.Response{stats: stats} = response
         {:ok, stats}
     end
   end
