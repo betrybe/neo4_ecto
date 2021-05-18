@@ -25,7 +25,7 @@ test:
     FROM +setup-base
     COPY --dir lib test ./
     RUN MIX_ENV=test mix deps.compile
-    RUN mix deps.get --only test && mix deps.unlock --check-unused
+    RUN mix deps.get --only test
     RUN mix deps.compile
     RUN mix compile --warnings-as-errors
 

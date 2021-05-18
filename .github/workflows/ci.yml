@@ -16,7 +16,7 @@ jobs:
         with:
           version: v0.5.10
       - uses: actions/checkout@v2
-      - name: test ectl_sql
+      - name: test elixir linters
         run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +setup-linters
   test-neo4j:
     name: linter
@@ -35,5 +35,5 @@ jobs:
         with:
           version: v0.5.10
       - uses: actions/checkout@v2
-      - name: test ectl_sql
+      - name: tests
         run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +test-neo4ecto
