@@ -6,6 +6,7 @@ jobs:
     name: linter
     runs-on: ubuntu-18.04
     strategy:
+      fail-fast: false
       matrix:
         elixir:
           - "1.9.2-erlang-22.3.4.16-alpine-3.13.1"
@@ -19,16 +20,15 @@ jobs:
       - name: test elixir linters
         run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +setup-linters
   test-neo4j:
-    name: linter
+    name: neo4j
     runs-on: ubuntu-18.04
     strategy:
+      fail-fast: false
       matrix:
         elixir:
-          - "1.9.2-erlang-22.3.4.16-alpine-3.13.1"
           - "1.12.0-rc.1-erlang-24.0-alpine-3.13.3"
         neo4j:
           - "4.1"
-          - "4.2"
           - "4.2.5"
     steps:
       - uses: earthly/actions/setup-earthly@v1
@@ -36,4 +36,4 @@ jobs:
           version: v0.5.10
       - uses: actions/checkout@v2
       - name: tests
-        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +test-neo4ecto
+        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} NEO4J=${{matrix.neo4j}} +test-neo4ecto
