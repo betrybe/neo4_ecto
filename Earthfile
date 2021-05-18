@@ -32,15 +32,15 @@ test:
 
 test-neo4ecto:
     FROM +test
-    ARG NEO4J="neo4j-arm64-experimental:4.2.5-arm64"
+    ARG NEO4J="neo4j/neo4j-arm64-experimental:4.2.5-arm64"
     WITH DOCKER \
-        --pull "neo4j/$NEO4J"
+        --pull "$NEO4J"
         RUN docker run --name neo4j --network=host -d -p 7687:7687 -e 'NEO4J_AUTH=none' \
                 --health-cmd="cypher-shell -u neo4j -p test 'RETURN 1'" \ 
                 --health-interval=10s \
                 --health-timeout=5s \ 
                 --health-start-period=10s \
                 --health-retries=5 \
-            "neo4j/$NEO4J"; \
+            "$NEO4J"; \
             mix test --trace --raise --include skip;
     END
