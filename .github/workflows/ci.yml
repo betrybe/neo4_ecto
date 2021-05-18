@@ -36,4 +36,4 @@ jobs:
           version: v0.5.10
       - uses: actions/checkout@v2
       - name: tests
-        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} NEO4J=${{matrix.neo4j}} +test-neo4ecto
+        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} --build-arg NEO4J=${{matrix.neo4j}} +test-neo4ecto
