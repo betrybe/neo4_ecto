@@ -36,7 +36,7 @@ test-neo4ecto:
     ARG NEO4J="neo4j/neo4j-arm64-experimental:4.2.5-arm64"
     WITH DOCKER \
         --pull "$NEO4J"
-        RUN docker run --name neo4j --network=host -d -p 7687:7687 -e 'NEO4J_AUTH=none' \
+        RUN docker run --name neo4j --network=host -d -p 7687:7687 -e "NEO4J_AUTH=none" \
                 --health-cmd="cypher-shell -u neo4j -p test 'RETURN 1'" \ 
                 --health-interval=10s \
                 --health-timeout=5s \ 
