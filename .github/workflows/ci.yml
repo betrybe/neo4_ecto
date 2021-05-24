@@ -3,28 +3,37 @@ on: [push]
 
 jobs:
   test:
+    name: linter
     runs-on: ubuntu-18.04
-    services:
-      neo4j:
-        image: neo4j:4.2
-        ports: ["7687:7687"]
-        env:
-          NEO4J_ACCEPT_LICENSE_AGREEMENT: yes
-          NEO4J_AUTH: none
-        options: >-
-          --health-cmd "cypher-shell -u neo4j -p test 'RETURN 1'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-start-period 10s
-          --health-retries 5
+    strategy:
+      fail-fast: false
+      matrix:
+        elixir:
+          - "1.9.2-erlang-22.3.4.16-alpine-3.13.1"
+          - "1.12.0-rc.1-erlang-24.0-alpine-3.13.3"
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-elixir@v1
+      - uses: earthly/actions/setup-earthly@v1
         with:
-          otp-version: "24.0-rc2"
-          elixir-version: "1.12.0-rc.0"
-      - run: mix deps.get --only test
-      - run: mix compile --warnings-as-errors
-      - run: mix format --check-formatted
-      - run: mix credo --strict
-      - run: mix test --trace --raise
+          version: v0.5.10
+      - uses: actions/checkout@v2
+      - name: test elixir linters
+        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +setup-linters
+  test-neo4j:
+    name: neo4j
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        elixir:
+          - "1.12.0-rc.1-erlang-24.0-alpine-3.13.3"
+        neo4j:
+          - "neo4j:4.1"
+          - "neo4j:4.2.5"
+    steps:
+      - uses: earthly/actions/setup-earthly@v1
+        with:
+          version: v0.5.10
+      - uses: actions/checkout@v2
+      - name: tests
+        run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} --build-arg NEO4J=${{matrix.neo4j}} +test-neo4ecto

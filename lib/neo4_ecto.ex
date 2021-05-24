@@ -87,7 +87,6 @@ defmodule Neo4Ecto do
   @impl Ecto.Adapter
   def init(opts) do
     config = opts || neo4j_url()
-
     {:ok, Sips.child_spec(config), %{}}
   end
 
