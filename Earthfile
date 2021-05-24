@@ -36,12 +36,11 @@ test-neo4ecto:
     ARG NEO4J="neo4j/neo4j-arm64-experimental:4.2.5-arm64"
     WITH DOCKER \
         --pull "$NEO4J"
-        RUN docker run --name neo4j --network=host -d -p 7687:7687 --env NEO4J_AUTH=none \
-                --health-cmd="cypher-shell -u neo4j -p test 'RETURN 1'" \ 
-                --health-interval=10s \
-                --health-timeout=5s \ 
-                --health-start-period=10s \
-                --health-retries=15 \
-            "$NEO4J"; \
-            mix test --trace --raise;
+         RUN docker run --name neo4j --network=host -d -p 7687:7687 --env NEO4J_AUTH=none "$NEO4J"; \
+        while ! docker exec neo4j bash -c "cypher-shell -u neo4j -p test 'RETURN 1'"; do \
+            test "$(date +%s)" -le "$timeout" || (echo "timed out waiting for neo4j"; exit 1); \
+            echo "waiting for neo4j"; \
+            sleep 1; \
+        done; \
+        mix test --trace --raise;
     END
