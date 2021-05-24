@@ -38,10 +38,10 @@ test-neo4ecto:
         --pull "$NEO4J"
         RUN docker run --name neo4j --network=host -d -p 7687:7687 --env NEO4J_AUTH=none \
                 --health-cmd="cypher-shell -u neo4j -p test 'RETURN 1'" \ 
-                --health-interval=10s \
-                --health-timeout=5s \ 
-                --health-start-period=10s \
-                --health-retries=5 \
+                --health-interval=5s \
+                --health-timeout=1s \ 
+                --health-start-period=5s \
+                --health-retries=15 \
             "$NEO4J"; \
             mix test --trace --raise;
     END
