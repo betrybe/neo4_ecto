@@ -22,7 +22,7 @@ setup-linters:
     RUN mix format --check-formatted
     RUN mix credo --strict
 
-test:
+test-setup:
     FROM +setup-base
     COPY --dir lib test ./
     RUN MIX_ENV=test mix deps.compile
@@ -32,13 +32,12 @@ test:
 
 
 test-neo4ecto:
-    FROM +test
+    FROM +test-setup
     ARG NEO4J="neo4j/neo4j-arm64-experimental:4.2.5-arm64"
     WITH DOCKER \
         --pull "$NEO4J"
          RUN docker run --name neo4j --network=host -d -p 7687:7687 --env NEO4J_AUTH=none "$NEO4J"; \
         while ! docker exec neo4j bash -c "cypher-shell -u neo4j -p test 'RETURN 1'"; do \
-            test "$(date +%s)" -le "$timeout" || (echo "timed out waiting for neo4j"; exit 1); \
             echo "waiting for neo4j"; \
             sleep 1; \
         done; \
