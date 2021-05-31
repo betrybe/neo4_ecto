@@ -16,7 +16,7 @@ setup-base:
     RUN mix local.hex --force
     RUN mix deps.get
 
-setup-linters:
+setup-code-check:
     FROM +setup-base
     RUN mix compile --warnings-as-errors
     RUN mix format --check-formatted
@@ -27,7 +27,6 @@ test-setup:
     RUN MIX_ENV=test mix deps.compile
     RUN mix deps.get --only test
     RUN mix deps.compile
-    RUN mix compile --warnings-as-errors
 
 
 test-neo4ecto:

@@ -81,12 +81,12 @@ Please make sure to update tests as appropriate.
 
 It is also possible to run tests under a containerized environment using [earthly](https://earthly.dev/get-earthly):
 
-    $ earthly -P +setup-linters
+    $ earthly -P +setup-code-check
     $ earthly -P +test-neo4ecto
 
 You can also use this to interactively debug any tests with diferent images of Neo4j and Elixir.
 
-    $ earthly -P -i --build-arg ELIXIR_BASE=1.12.0-rc.1-erlang-24.0-alpine-3.13.3 +setup-linter
+    $ earthly -P -i --build-arg ELIXIR_BASE=1.12.0-rc.1-erlang-24.0-alpine-3.13.3 +setup-code-check
     $ earthly -P -i --build-arg ELIXIR_BASE=1.8.2-erlang-20.3.8.26-alpine-3.11.6 --build-arg NEO4J=4.1 +test-neo4ecto
 
 
