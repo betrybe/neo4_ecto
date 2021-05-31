@@ -20,7 +20,6 @@ setup-linters:
     FROM +setup-base
     RUN mix compile --warnings-as-errors
     RUN mix format --check-formatted
-    RUN mix credo --strict
 
 test-setup:
     FROM +setup-base

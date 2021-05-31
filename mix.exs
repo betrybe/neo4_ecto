@@ -30,13 +30,12 @@ defmodule Neo4Ecto.MixProject do
     [
       {:ecto, "~> 3.6.1"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:bolt_sips, "~> 2.0"},
-      {:credo, "~> 1.3", only: [:dev, :test], runtime: false}
+      {:bolt_sips, "~> 2.0"}
     ]
   end
 
   defp description do
-    "Neo4Ecto is an Ecto adapter that sits on top of Bolt.Sips driver."
+    "Neo4Ecto is an Ecto adapter that sits on top of Bolt.Sips driver and Ecto Data Mapping Tool Kit."
   end
 
   defp package do
