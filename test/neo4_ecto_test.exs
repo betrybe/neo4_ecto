@@ -1,10 +1,9 @@
-defmodule Neo4EctoTest do
+defmodule Ecto.Adapters.Neo4EctoTest do
   use ExUnit.Case
 
   alias Bolt.Sips
   alias Neo4Ecto.TestRepo, as: Repo
-
-  doctest Neo4Ecto
+  doctest Ecto.Adapters.Neo4Ecto
 
   defmodule User do
     use Ecto.Schema
@@ -100,6 +99,39 @@ defmodule Neo4EctoTest do
       assert info.state == :deleted
 
       assert %{records: []} = Sips.query!(conn, "MATCH (n) WHERE id(n) = #{user.id} RETURN n")
+    end
+  end
+
+  describe "query/2" do
+    test "returns tuple with success" do
+      {:ok, %Sips.Response{results: results}} = Repo.query("RETURN 1 as N;")
+      assert results == [%{"N" => 1}]
+    end
+
+    test "returns tuple with error" do
+      {:ok, %Sips.Response{results: results}} = Repo.query("RETURN 1 as N;")
+      assert results == [%{"N" => 1}]
+    end
+
+    test "executes query with params" do
+      {:ok, %Sips.Response{results: results}} = Repo.query("RETURN $number as N;", %{number: 1})
+      assert results == [%{"N" => 1}]
+    end
+  end
+
+  describe "query!/2" do
+    test "returns directly response" do
+      %Sips.Response{results: results} = Repo.query!("RETURN 1 as N;")
+      assert results == [%{"N" => 1}]
+    end
+
+    test "raises error on invalid querie" do
+      assert_raise Sips.Exception, fn -> Repo.query!("INVALID 1;") end
+    end
+
+    test "executes query with params" do
+      %Sips.Response{results: results} = Repo.query!("RETURN $number as N;", %{number: 1})
+      assert results == [%{"N" => 1}]
     end
   end
 

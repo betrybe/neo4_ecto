@@ -1,4 +1,4 @@
-defmodule Neo4Ecto.Migration.Runner do
+defmodule Ecto.Neo4Ecto.Migration.Runner do
   @moduledoc """
   Handles execution of all migration operations:
     - :up

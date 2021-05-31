@@ -1,4 +1,4 @@
-defmodule Neo4Ecto.QueryBuilder do
+defmodule Ecto.Adapters.Neo4Ecto.QueryBuilder do
   @moduledoc false
 
   @type node_name() :: String.t()
@@ -12,7 +12,7 @@ defmodule Neo4Ecto.QueryBuilder do
 
   ## Example
 
-      iex> Neo4Ecto.QueryBuilder.cypher(:create, "user", [name: "John Doe", age: 27])
+      iex> Ecto.Adapters.Neo4Ecto.QueryBuilder.cypher(:create, "user", [name: "John Doe", age: 27])
       "CREATE (n:User) SET n.name = 'John Doe', n.age = '27' RETURN n"
 
   """

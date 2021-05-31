@@ -1,8 +1,11 @@
-defmodule Neo4Ecto.Migrator do
+defmodule Ecto.Neo4Ecto.Migrator do
   @moduledoc """
   Handles migrations modules loading and version control
   """
-  alias Neo4Ecto.Migration.Runner
+
+  alias Bolt.Sips
+  alias Ecto.Adapters.Neo4Ecto
+  alias Ecto.Neo4Ecto.Migration.Runner
 
   require Logger
 
@@ -24,7 +27,9 @@ defmodule Neo4Ecto.Migrator do
   defp migrations_info, do: Enum.map(migration_files(), &extract_migration_info(&1))
 
   defp get_versions do
-    {:ok, versions} = Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm;")
+    {:ok, %Sips.Response{results: versions}} =
+      Neo4Ecto.query("MATCH (sm:SCHEMA_MIGRATION) RETURN sm;")
+
     versions
   end
 
