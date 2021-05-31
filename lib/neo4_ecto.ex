@@ -15,7 +15,7 @@ defmodule Ecto.Adapters.Neo4Ecto do
   Set `Neo4Ecto` as the default Ecto Adapter inside your Repo module:
 
       defmodule MyApp.Repo do
-        use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+        use Ecto.Repo, otp_app: :my_app, adapter: Ecto.Adapters.Neo4Ecto
       end
 
   Add the proper configuration for Ecto to recognize your Neo4j

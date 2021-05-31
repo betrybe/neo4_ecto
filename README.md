@@ -31,7 +31,7 @@ config :my_app, MyApp.Repo,
 
 # lib/my_app/repo.ex
 defmodule MyApp.Repo do
-  use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+  use Ecto.Repo, otp_app: :my_app, adapter: Ecto.Adapters.Neo4Ecto
 end
 ```
 
