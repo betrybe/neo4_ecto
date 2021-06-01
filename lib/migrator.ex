@@ -5,7 +5,6 @@ defmodule Ecto.Neo4Ecto.Migrator do
 
   alias Bolt.Sips
   alias Ecto.{Adapters.Neo4Ecto, Neo4Ecto.Migration.Runner}
-  alias Ecto.Neo4Ecto.Migration.Runner
 
   require Logger
 
