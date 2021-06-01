@@ -179,7 +179,15 @@ defmodule Ecto.Adapters.Neo4Ecto do
 
       iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1}")
   """
-  def query(query, params \\ %{}) do
+  def query(query, params \\ %{})
+
+  def query(query, %{__struct__: _} = params) do
+    map_params = Map.from_struct(params)
+
+    query(query, map_params)
+  end
+
+  def query(query, params) when is_map(params) do
     conn = Sips.conn()
 
     Sips.query(conn, query, params)
@@ -188,7 +196,15 @@ defmodule Ecto.Adapters.Neo4Ecto do
   @doc """
     Same as `query/2` but raises on invalid queries.
   """
-  def query!(query, params \\ %{}) do
+  def query!(query, params \\ %{})
+
+  def query!(query, %{__struct__: _} = params) do
+    map_params = Map.from_struct(params)
+
+    query(query, map_params)
+  end
+
+  def query!(query, params) when is_map(params) do
     conn = Sips.conn()
 
     Sips.query!(conn, query, params)

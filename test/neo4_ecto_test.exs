@@ -117,6 +117,13 @@ defmodule Ecto.Adapters.Neo4EctoTest do
       {:ok, %Sips.Response{results: results}} = Repo.query("RETURN $number as N;", %{number: 1})
       assert results == [%{"N" => 1}]
     end
+
+    test "converts struct params to map and executes query" do
+      {:ok, %Sips.Response{results: results}} =
+        Repo.query("RETURN $name as N;", %User{name: "Covid"})
+
+      assert results == [%{"N" => "Covid"}]
+    end
   end
 
   describe "query!/2" do
@@ -132,6 +139,13 @@ defmodule Ecto.Adapters.Neo4EctoTest do
     test "executes query with params" do
       %Sips.Response{results: results} = Repo.query!("RETURN $number as N;", %{number: 1})
       assert results == [%{"N" => 1}]
+    end
+
+    test "converts struct params to map and executes query" do
+      {:ok, %Sips.Response{results: results}} =
+        Repo.query("RETURN $name as N;", %User{name: "Covid"})
+
+      assert results == [%{"N" => "Covid"}]
     end
   end
 
