@@ -181,15 +181,13 @@ defmodule Ecto.Adapters.Neo4Ecto do
   """
   def query(query, params \\ %{})
 
-  def query(query, %{__struct__: _} = params) do
+  def query(query, params) when is_struct(params) do
     map_params = Map.from_struct(params)
-
     query(query, map_params)
   end
 
   def query(query, params) when is_map(params) do
     conn = Sips.conn()
-
     Sips.query(conn, query, params)
   end
 
@@ -198,15 +196,13 @@ defmodule Ecto.Adapters.Neo4Ecto do
   """
   def query!(query, params \\ %{})
 
-  def query!(query, %{__struct__: _} = params) do
+  def query!(query, params) when is_struct(params) do
     map_params = Map.from_struct(params)
-
-    query(query, map_params)
+    query!(query, map_params)
   end
 
   def query!(query, params) when is_map(params) do
     conn = Sips.conn()
-
     Sips.query!(conn, query, params)
   end
 
