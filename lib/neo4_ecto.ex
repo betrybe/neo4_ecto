@@ -150,6 +150,8 @@ defmodule Ecto.Adapters.Neo4Ecto do
 
   defp do_delete(_response), do: {:ok, []}
 
+  @spec struct_response({:ok, Bolt.Sips.Response.t()}) :: {:ok, any}
+  @doc false
   def struct_response({:ok, %Sips.Response{type: type} = response}) do
     case type do
       rw when rw in ["rw"] ->
@@ -172,10 +174,11 @@ defmodule Ecto.Adapters.Neo4Ecto do
   On success, it returns a Bolt Sips Tuple containing
   a map with two keys: %{:ok, %Bolt.Sips.Response{}}
 
+  You can use it passings eith the params to the query as the second option.
   ### Example
-      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id}", %{id: "unique_id"})
+      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id} RETURN n;", %{id: "unique_id"})
 
-      or without params
+  Or just sending the value directly to the raw query.
 
       iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1}")
   """
@@ -192,7 +195,7 @@ defmodule Ecto.Adapters.Neo4Ecto do
   end
 
   @doc """
-    Same as `query/2` but raises on invalid queries.
+    Same as `query/2` but raises error on invalid queries.
   """
   def query!(query, params \\ %{})
 

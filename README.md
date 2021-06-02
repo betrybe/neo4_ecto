@@ -4,6 +4,8 @@ Neo4Ecto is an Ecto adapter that sits on top of [Bolt.Sips](https://github.com/f
 
 It allows you to deal with a [Neo4j](http://neo4j.com) database through Ecto.
 
+Check out the ([documentation](https://hex.pm/packages/neo4_ecto))
+
 ## Installation
 
 Add the lib to your `mix.exs`
