@@ -1,4 +1,4 @@
-defmodule Neo4Ecto do
+defmodule Ecto.Adapters.Neo4Ecto do
   @moduledoc """
   Neo4Ecto is a Neo4j Adapter for Ecto.
 
@@ -15,7 +15,7 @@ defmodule Neo4Ecto do
   Set `Neo4Ecto` as the default Ecto Adapter inside your Repo module:
 
       defmodule MyApp.Repo do
-        use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+        use Ecto.Repo, otp_app: :my_app, adapter: Ecto.Adapters.Neo4Ecto
       end
 
   Add the proper configuration for Ecto to recognize your Neo4j
@@ -67,17 +67,18 @@ defmodule Neo4Ecto do
       |> Repo.insert()
 
   """
-
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
   @behaviour Ecto.Adapter.Storage
 
-  import Neo4Ecto.QueryBuilder
+  import Ecto.Adapters.Neo4Ecto.QueryBuilder
 
   alias Bolt.Sips
 
   @impl Ecto.Adapter
-  defmacro __before_compile__(_opts), do: :ok
+  defmacro __before_compile__(env) do
+    Ecto.Adapters.Neo4Ecto.before_compile(env)
+  end
 
   @impl Ecto.Adapter
   def ensure_all_started(_config, type) do
@@ -86,7 +87,7 @@ defmodule Neo4Ecto do
 
   @impl Ecto.Adapter
   def init(opts) do
-    config = opts || neo4j_url()
+    config = opts
     {:ok, Sips.child_spec(config), %{}}
   end
 
@@ -116,7 +117,8 @@ defmodule Neo4Ecto do
   def insert(_adapter_meta, %{source: node}, fields, _on_conflict, _returning, _opts) do
     :create
     |> cypher(node, fields)
-    |> execute()
+    |> query()
+    |> struct_response()
   end
 
   @impl Ecto.Adapter.Schema
@@ -126,7 +128,8 @@ defmodule Neo4Ecto do
   def update(_adapter_meta, %{source: node}, fields, [id: id], _returning, _opts) do
     :update
     |> cypher(node, fields, id)
-    |> execute()
+    |> query()
+    |> struct_response()
     |> do_update()
   end
 
@@ -134,20 +137,22 @@ defmodule Neo4Ecto do
   def delete(_adapter_meta, %{source: node}, [id: id], _opts) do
     :delete
     |> cypher(node, id)
-    |> execute()
+    |> query()
+    |> struct_response()
     |> do_delete()
   end
 
-  def execute(query) do
-    Sips.conn()
-    |> Sips.query(query)
-    |> case do
-      {:ok, response} -> parse_response(response)
-      {:error, error} -> {:error, error}
-    end
-  end
+  # ToDo: Refactor delete and update responses to follow Repo.Schema.load_each/4 pattern
+  ##  defp load_each(struct, [{_, value} | kv], [{key, type} | types], adapter)
+  ##  defp load_each(struct, [], _types, _adapter)
 
-  defp parse_response(%Sips.Response{type: type} = response) do
+  defp do_update(_response), do: {:ok, []}
+
+  defp do_delete(_response), do: {:ok, []}
+
+  @spec struct_response({:ok, Bolt.Sips.Response.t()}) :: {:ok, any}
+  @doc false
+  def struct_response({:ok, %Sips.Response{type: type} = response}) do
     case type do
       rw when rw in ["rw"] ->
         %Sips.Response{records: [[response]]} = response
@@ -163,13 +168,57 @@ defmodule Neo4Ecto do
     end
   end
 
-  # ToDo: Refactor delete and update responses to follow Repo.Schema.load_each/4 pattern
-  ##  defp load_each(struct, [{_, value} | kv], [{key, type} | types], adapter)
-  ##  defp load_each(struct, [], _types, _adapter)
+  @doc """
+  Run a pure Cypher query directly on database.
 
-  defp do_update(_response), do: {:ok, []}
+  On success, it returns a Bolt Sips Tuple containing
+  a map with two keys: %{:ok, %Bolt.Sips.Response{}}
 
-  defp do_delete(_response), do: {:ok, []}
+  You can use it passings eith the params to the query as the second option.
+  ### Example
+      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id} RETURN n;", %{id: "unique_id"})
 
-  defp neo4j_url, do: Application.get_env(:neotest, :neo4j_url)
+  Or just sending the value directly to the raw query.
+
+      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1}")
+  """
+  def query(query, params \\ %{})
+
+  def query(query, params) when is_struct(params) do
+    map_params = Map.from_struct(params)
+    query(query, map_params)
+  end
+
+  def query(query, params) when is_map(params) do
+    conn = Sips.conn()
+    Sips.query(conn, query, params)
+  end
+
+  @doc """
+    Same as `query/2` but raises error on invalid queries.
+  """
+  def query!(query, params \\ %{})
+
+  def query!(query, params) when is_struct(params) do
+    map_params = Map.from_struct(params)
+    query!(query, map_params)
+  end
+
+  def query!(query, params) when is_map(params) do
+    conn = Sips.conn()
+    Sips.query!(conn, query, params)
+  end
+
+  @doc false
+  def before_compile(_env) do
+    quote do
+      def query(query, params \\ %{}) do
+        Ecto.Adapters.Neo4Ecto.query(query, params)
+      end
+
+      def query!(query, params \\ %{}) do
+        Ecto.Adapters.Neo4Ecto.query!(query, params)
+      end
+    end
+  end
 end

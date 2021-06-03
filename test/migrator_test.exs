@@ -3,8 +3,9 @@ defmodule Neo4Ecto.MigratorTest do
 
   import ExUnit.CaptureLog
   import Support.FileHelpers
-
-  alias Neo4Ecto.Migrator
+  alias Bolt.Sips
+  alias Ecto.Neo4Ecto.Migrator
+  alias Neo4Ecto.TestRepo, as: Repo
 
   defp create_migration(name, repo_name) do
     module = name |> Path.basename() |> Path.rootname()
@@ -22,14 +23,15 @@ defmodule Neo4Ecto.MigratorTest do
   end
 
   defp schema_migrations do
-    {:ok, migrations} = Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) RETURN sm")
+    {:ok, %Sips.Response{results: migrations}} =
+      Repo.query("MATCH (sm:SCHEMA_MIGRATION) RETURN sm")
+
     migrations
   end
 
   defp clean_up do
     if File.exists?("priv") do
       Migrator.run(:down)
-      Neo4Ecto.execute("MATCH (sm:SCHEMA_MIGRATION) DELETE sm")
     end
   end
 

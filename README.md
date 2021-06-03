@@ -4,13 +4,15 @@ Neo4Ecto is an Ecto adapter that sits on top of [Bolt.Sips](https://github.com/f
 
 It allows you to deal with a [Neo4j](http://neo4j.com) database through Ecto.
 
+Check out the ([documentation](https://hex.pm/packages/neo4_ecto))
+
 ## Installation
 
 Add the lib to your `mix.exs`
 ```elixir
 def deps do
   [
-    {:neo4_ecto, "~> 0.1.0"}
+    {:neo4_ecto, "~> 0.0.2"}
   ]
 end
 ```
@@ -31,7 +33,7 @@ config :my_app, MyApp.Repo,
 
 # lib/my_app/repo.ex
 defmodule MyApp.Repo do
-  use Ecto.Repo, otp_app: :my_app, adapter: Neo4Ecto
+  use Ecto.Repo, otp_app: :my_app, adapter: Ecto.Adapters.Neo4Ecto
 end
 ```
 
@@ -81,12 +83,12 @@ Please make sure to update tests as appropriate.
 
 It is also possible to run tests under a containerized environment using [earthly](https://earthly.dev/get-earthly):
 
-    $ earthly -P +setup-linters
+    $ earthly -P +setup-code-check
     $ earthly -P +test-neo4ecto
 
 You can also use this to interactively debug any tests with diferent images of Neo4j and Elixir.
 
-    $ earthly -P -i --build-arg ELIXIR_BASE=1.12.0-rc.1-erlang-24.0-alpine-3.13.3 +setup-linter
+    $ earthly -P -i --build-arg ELIXIR_BASE=1.12.0-rc.1-erlang-24.0-alpine-3.13.3 +setup-code-check
     $ earthly -P -i --build-arg ELIXIR_BASE=1.8.2-erlang-20.3.8.26-alpine-3.11.6 --build-arg NEO4J=4.1 +test-neo4ecto
 
 
