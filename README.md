@@ -12,7 +12,7 @@ Add the lib to your `mix.exs`
 ```elixir
 def deps do
   [
-    {:neo4_ecto, "~> 0.1.0"}
+    {:neo4_ecto, "~> 0.0.2"}
   ]
 end
 ```
