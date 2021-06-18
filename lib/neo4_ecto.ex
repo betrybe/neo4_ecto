@@ -110,7 +110,7 @@ defmodule Ecto.Adapters.Neo4Ecto do
   defdelegate storage_status(config), to: Neo4Ecto.Storage
 
   @impl Ecto.Adapter.Schema
-  def autogenerate(:binary_id), do: Ecto.UUID.generate()
+  def autogenerate(:binary_id), do: Ecto.UUID.bingenerate()
   def autogenerate(_), do: nil
 
   @impl Ecto.Adapter.Schema
@@ -150,13 +150,15 @@ defmodule Ecto.Adapters.Neo4Ecto do
 
   defp do_delete(_response), do: {:ok, []}
 
-  @spec struct_response({:ok, Bolt.Sips.Response.t()}) :: {:ok, any}
-  @doc false
-  def struct_response({:ok, %Sips.Response{type: type} = response}) do
+  defp struct_response({:ok, %Sips.Response{type: type} = response}) do
     case type do
       rw when rw in ["rw"] ->
         %Sips.Response{records: [[response]]} = response
-        {:ok, [id: response.id]}
+
+        case Map.get(response.properties, "id") do
+          nil -> {:ok, [id: response.id]}
+          _ -> {:ok, []}
+        end
 
       r when r in ["r"] ->
         %Sips.Response{results: results} = response
