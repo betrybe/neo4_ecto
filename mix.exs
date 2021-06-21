@@ -40,7 +40,12 @@ defmodule Neo4Ecto.MixProject do
 
   defp package do
     [
-      maintainers: ["Norberto Oliveira Junior", "Ramon Gonçalves", "Víctor Caciquinho Pereira", "Willian Frantz"],
+      maintainers: [
+        "Norberto Oliveira Junior",
+        "Ramon Gonçalves",
+        "Víctor Caciquinho Pereira",
+        "Willian Frantz"
+      ],
       files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => "https://github.com/betrybe/neo4_ecto/"}
