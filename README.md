@@ -71,6 +71,18 @@ defmodule Accounts do
     |> Repo.insert()
   end
 end
+
+defmodule Example.App do
+  alias Example.Repo
+
+  def get_user_by_id do
+    Repo.query("MATCH (u:User {id: $user_id}) RETURN u;", %{user_id: 1})
+  end
+
+  def get_user_followers! do
+    Repo.query!("MATCH (u:User)-[:FOLLOWS]->(:User {id: $user_id}) RETURN u;", %{user_id: 1})
+  end
+end
 ```
 
 
