@@ -171,18 +171,21 @@ defmodule Ecto.Adapters.Neo4Ecto do
   end
 
   @doc """
-  Run a pure Cypher query directly on database.
+  Executes a raw Cypher Query on the database.
 
-  On success, it returns a Bolt Sips Tuple containing
-  a map with two keys: %{:ok, %Bolt.Sips.Response{}}
+  Returns a success tuple `{:ok, %Bolt.Sips.Response{}}` when it
+  succeds.
 
-  You can use it passings eith the params to the query as the second option.
-  ### Example
+  ## Example
+
+  Isolated args:
+
       iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id} RETURN n;", %{id: "unique_id"})
 
-  Or just sending the value directly to the raw query.
+  Or just sending the value directly to the raw query:
 
       iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1}")
+
   """
   def query(query, params \\ %{})
 
