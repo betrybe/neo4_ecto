@@ -72,7 +72,7 @@ defmodule Accounts do
   end
 end
 
-#lib/my_app/app.ex
+# lib/my_app/app.ex
 defmodule Example.App do
   alias Example.Repo
 
