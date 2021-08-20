@@ -180,11 +180,11 @@ defmodule Ecto.Adapters.Neo4Ecto do
 
   Isolated args:
 
-      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id} RETURN n;", %{id: "unique_id"})
+      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: $id}) RETURN n;", %{id: "unique_id"})
 
   Or just sending the value directly to the raw query:
 
-      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1}")
+      iex> Ecto.Adapters.Neo4Ecto.query("MATCH (n:User {id: 1})")
 
   """
   def query(query, params \\ %{})
