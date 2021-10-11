@@ -1,5 +1,12 @@
 defmodule Ecto.Adapters.Neo4Ecto.QueryBuilder do
-  @moduledoc false
+  @moduledoc """
+  This module holds the cypher implementation for basic CRUD operations, including:
+    - create;
+    - delete;
+    - update.
+
+  Check more on `cypher/3` and `cypher/4` functions bellow.
+  """
 
   @type node_name() :: String.t()
   @type op_name() :: atom()

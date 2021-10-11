@@ -50,8 +50,7 @@ defmodule Ecto.Adapters.Neo4Ecto do
 
         @doc false
         def changeset(user, attrs) do
-          user
-          |> cast(attrs, [:name, :age])
+          cast(user, attrs, [:name, :age])
         end
       end
 
