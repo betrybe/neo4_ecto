@@ -1,9 +1,9 @@
-defmodule Ecto.Adapters.Neo4Ecto.QueryBuilderTest do
+defmodule Neo4Ecto.QueryBuilderTest do
   use ExUnit.Case
 
-  alias Ecto.Adapters.Neo4Ecto.QueryBuilder
+  alias Neo4Ecto.QueryBuilder
 
-  doctest Ecto.Adapters.Neo4Ecto.QueryBuilder
+  doctest Neo4Ecto.QueryBuilder
 
   describe "create cypher" do
     test "returns create query when valid params" do

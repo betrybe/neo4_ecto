@@ -66,13 +66,15 @@ defmodule Ecto.Adapters.Neo4Ecto do
       |> Repo.insert()
 
   """
+
+  use Neo4Ecto.Behaviours.Query
+
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Schema
   @behaviour Ecto.Adapter.Storage
 
-  import Ecto.Adapters.Neo4Ecto.QueryBuilder
-
   alias Bolt.Sips
+  import Neo4Ecto.QueryBuilder
 
   @impl Ecto.Adapter
   defmacro __before_compile__(env) do
