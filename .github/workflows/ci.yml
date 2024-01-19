@@ -21,7 +21,7 @@ jobs:
         run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixir}} +setup-code-check
   test-neo4j:
     name: neo4j
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
     strategy:
       fail-fast: false
       matrix:
